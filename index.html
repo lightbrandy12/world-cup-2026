@@ -251,6 +251,32 @@ body {
 }
 .stats-bar span { font-weight: 700; color: var(--text); }
 
+/* ===== Featured Matches ===== */
+.featured-card {
+  background: var(--card); border-radius: var(--radius); padding: 0;
+  margin-bottom: 10px; box-shadow: var(--shadow); cursor: pointer; overflow: hidden;
+  transition: all .2s;
+}
+.featured-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,.12); }
+.featured-header {
+  display: flex; align-items: center; gap: 12px; padding: 14px 16px;
+}
+.featured-icon { font-size: 28px; flex-shrink: 0; }
+.featured-info { flex: 1; min-width: 0; }
+.featured-title { font-weight: 700; font-size: 15px; color: var(--text); }
+.featured-meta { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.featured-arrow { font-size: 14px; color: #ccc; transition: transform .3s; flex-shrink: 0; }
+.featured-card.expanded .featured-arrow { transform: rotate(180deg); color: var(--pitch); }
+.featured-body {
+  max-height: 0; overflow: hidden; transition: max-height .4s ease, padding .4s ease;
+  font-size: 13px; color: #555; line-height: 1.8; padding: 0 16px;
+  border-top: 0 solid #f0ebe0;
+}
+.featured-card.expanded .featured-body {
+  max-height: 300px; padding: 12px 16px 16px;
+  border-top: 1px solid #f0ebe0;
+}
+
 /* ===== Footer ===== */
 .footer {
   text-align: center; padding: 24px 16px; font-size: 12px; color: var(--text-muted);
@@ -275,6 +301,9 @@ body {
   .venue-modal { max-width: 95vw; }
   .venue-modal-img { height: 200px; }
   .venue-modal-loader { height: 200px; font-size: 12px; }
+  .featured-icon { font-size: 24px; }
+  .featured-title { font-size: 13px; }
+  .featured-body { font-size: 12px; }
 }
 </style>
 </head>
@@ -312,6 +341,7 @@ body {
   <button class="tab" data-tab="group">🏟 小组赛</button>
   <button class="tab" data-tab="knockout">🏆 淘汰赛</button>
   <button class="tab" data-tab="venues">📍 场馆</button>
+  <button class="tab" data-tab="featured">🔥 必看推荐</button>
 </nav>
 
 <!-- ===== Filters ===== -->
@@ -322,6 +352,7 @@ body {
 <div class="match-list" id="match-list"></div>
 <div id="bracket-view" style="display:none;"></div>
 <div id="venue-view" style="display:none;"></div>
+<div id="featured-view" style="display:none;"></div>
 
 <footer class="footer">
   数据来源：FIFA 官方赛程 · 2026 美加墨世界杯™ · 共 48 支球队 · 104 场比赛<br>
@@ -828,6 +859,80 @@ function renderVenues() {
   container.innerHTML = html;
 }
 
+const FEATURED = [
+  {
+    icon:'🏆', title:'揭幕战：墨西哥 vs 南非',
+    date:'6月12日 03:00', venue:'墨西哥城 · 阿兹特克体育场',
+    desc:'2026世界杯的第一声哨响！东道主墨西哥坐镇传奇的阿兹特克体育场，8.7万球迷的声浪将震撼世界。2010年南非世界杯揭幕战，两队1-1握手言和；16年后角色互换，墨西哥能否用一场胜利点燃整个美洲大陆？阿兹特克高原的海拔将是南非队最大的敌人。',
+  },
+  {
+    icon:'🐐', title:'梅西最后一舞：阿根廷 vs 阿尔及利亚',
+    date:'6月17日 09:00', venue:'堪萨斯城 · 箭头体育场',
+    desc:'这可能是梅西世界杯生涯的最后一场小组首战。作为卫冕冠军，阿根廷背负着全世界的期待。阿尔及利亚曾在2014年将最终的冠军德国队逼入加时，绝非善类。梅西的每一次触球都可能是历史，不要错过！',
+  },
+  {
+    icon:'⚔️', title:'2018半决赛重演：英格兰 vs 克罗地亚',
+    date:'6月18日 03:00', venue:'达拉斯 · AT&T体育场',
+    desc:'2018年世界杯半决赛，英格兰加时2-1绝杀克罗地亚，格子军团含恨离场。8年后再度相遇，莫德里奇迎来职业生涯的最后一届世界杯，贝林厄姆则代表着英格兰的新黄金一代。旧恨新仇，达拉斯的夜空将见证经典。',
+  },
+  {
+    icon:'👑', title:'卫冕冠军遇非洲冠军：法国 vs 塞内加尔',
+    date:'6月17日 03:00', venue:'纽约/新泽西 · 大都会人寿体育场',
+    desc:'2002年世界杯揭幕战，卫冕冠军法国0-1爆冷输给塞内加尔，成为世界杯史上最大冷门之一。24年过去了，姆巴佩领衔的新一代法国队能否在世界杯舞台上完成复仇？塞内加尔作为非洲杯冠军，绝不会轻易缴械。',
+  },
+  {
+    icon:'🌟', title:'新老球王对决：挪威 vs 法国',
+    date:'6月27日 03:00', venue:'波士顿 · 吉列体育场',
+    desc:'姆巴佩 vs 哈兰德——这不是电子游戏，这是真实的世界杯！两位足坛最具统治力的超级前锋正面交锋，这场比赛很可能决定I组头名归属，也是小组赛阶段最受全球瞩目的对决。未来十年足坛的王者之争，这一刻提前上演。',
+  },
+  {
+    icon:'🇧🇷', title:'五星巴西首秀：巴西 vs 摩洛哥',
+    date:'6月14日 06:00', venue:'纽约/新泽西 · 大都会人寿体育场',
+    desc:'五届世界杯冠军巴西队出战！维尼修斯、罗德里戈等新生代桑巴天才首次以核心身份踏上世界杯舞台。对手摩洛哥是上届世界杯四强最大黑马，阿什拉夫领衔的防线绝不好惹。皇马队友维尼修斯与阿什拉夫各为其主，兵戎相见！',
+  },
+  {
+    icon:'🇺🇸', title:'东道主亮相：美国 vs 巴拉圭',
+    date:'6月13日 09:00', venue:'洛杉矶 · SoFi体育场',
+    desc:'美国队坐镇主场，普利西奇率领的青年军肩负整个国家的期望。SoFi体育场的7万观众将营造出令人窒息的主场氛围。巴拉圭以铁血防守著称，他们最擅长的就是在客场搅局。东道主首秀，压力与荣耀并存。',
+  },
+  {
+    icon:'🥅', title:'C罗最后一舞首战：葡萄牙 vs 刚果(金)',
+    date:'6月18日 01:00', venue:'休斯顿 · NRG体育场',
+    desc:'这极可能是C罗世界杯生涯的最后一次征程。从2006年到2026年，横跨20年的传奇即将写下终章。刚果(金)时隔52年重返世界杯，他们将为每一个球拼尽全力。传奇谢幕的开篇，休斯顿见证历史。',
+  },
+  {
+    icon:'🔥', title:'小组最强碰撞：乌拉圭 vs 西班牙',
+    date:'6月27日 06:00', venue:'瓜达拉哈拉 · 阿克伦体育场',
+    desc:'H组最强两队正面交锋！乌拉圭拥有巴尔韦德、努涅斯等当红球星，铁血防守是他们的DNA。西班牙则带着新一代传控足球而来，佩德里、加维等天才少年渴望证明自己。矛与盾的极致对决，H组头名在此一役。',
+  },
+  {
+    icon:'👑', title:'世界杯决赛',
+    date:'7月19日 03:00', venue:'纽约/新泽西 · 大都会人寿体育场',
+    desc:'104场比赛的终点，39天征途的巅峰。全球数十亿人屏息注视，两支最强球队在大都会人寿体育场争夺足球世界的最高荣誉——大力神杯。四年等待，90分钟定乾坤。无论谁捧杯，都将载入史册。',
+  },
+];
+
+function renderFeatured() {
+  const container = document.getElementById('featured-view');
+  let html = '<div style="padding:0 16px;max-width:800px;margin:0 auto;"><h3 style="margin:16px 0 12px;">🔥 必看比赛推荐 · 点击展开详情</h3>';
+  FEATURED.forEach((m, i) => {
+    html += `
+      <div class="featured-card" onclick="this.classList.toggle('expanded')">
+        <div class="featured-header">
+          <span class="featured-icon">${m.icon}</span>
+          <div class="featured-info">
+            <div class="featured-title">${m.title}</div>
+            <div class="featured-meta">📅 ${m.date} &nbsp;|&nbsp; 📍 ${m.venue}</div>
+          </div>
+          <span class="featured-arrow">▼</span>
+        </div>
+        <div class="featured-body">${m.desc}</div>
+      </div>`;
+  });
+  html += '</div>';
+  container.innerHTML = html;
+}
+
 function renderFilterChips() {
   const container = document.getElementById('filter-groups');
   let html = '<button class="filter-chip active" data-group="">全部</button>';
@@ -873,12 +978,17 @@ function applyFilters() {
   }
 
   // Update visibility
-  document.getElementById('match-list').style.display = activeTab === 'venues' ? 'none' : 'block';
+  const isFeatured = activeTab === 'featured';
+  const isVenues = activeTab === 'venues';
+  document.getElementById('match-list').style.display = (isVenues || isFeatured) ? 'none' : 'block';
   document.getElementById('bracket-view').style.display = activeTab === 'knockout' ? 'block' : 'none';
-  document.getElementById('venue-view').style.display = activeTab === 'venues' ? 'block' : 'none';
-  document.getElementById('filter-groups').style.display = activeTab === 'venues' ? 'none' : 'flex';
+  document.getElementById('venue-view').style.display = isVenues ? 'block' : 'none';
+  document.getElementById('featured-view').style.display = isFeatured ? 'block' : 'none';
+  document.getElementById('filter-groups').style.display = (isVenues || isFeatured) ? 'none' : 'flex';
 
-  if (activeTab === 'venues') {
+  if (isFeatured) {
+    renderFeatured();
+  } else if (isVenues) {
     renderVenues();
   } else {
     renderMatchList(filtered);
