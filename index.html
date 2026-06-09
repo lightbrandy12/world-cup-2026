@@ -775,34 +775,23 @@ function showVenueModal(venue) {
   overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
   document.addEventListener('keydown', function esc(e) { if (e.key === 'Escape') { close(); document.removeEventListener('keydown', esc); } });
 
-  // 从 Wikipedia 获取图片
+  // 直接用本地 SVG 场馆图，无需联网，秒加载
   const loader = overlay.querySelector('.venue-modal-loader');
+  const slug = wikiPage.toLowerCase().replace(/%27/g,'').replace(/%26/g,'').replace(/_/g,'');
+  const svgMap = {
+    'estadioazteca':'azteca','metlifestadium':'metlife','attstadium':'att',
+    'arrowheadstadium':'arrowhead','nrgstadium':'nrg','mercedes-benzstadium':'mercedesbenz',
+    'sofistadium':'sofi','lincolnfinancialfield':'lincoln','lumenfield':'lumen',
+    'levisstadium':'levis','gillettestadium':'gillette','hardrockstadium':'hardrock',
+    'bcplace':'bcplace','bmofield':'bmo','estadiobbva':'bbva','estadioakron':'akron'
+  };
+  const imgFile = svgMap[slug] || slug;
   const img = document.createElement('img');
   img.className = 'venue-modal-img';
   img.alt = name;
+  img.src = `img/${imgFile}.svg`;
   img.onload = () => { loader.replaceWith(img); };
-  img.onerror = () => {
-    // Wikipedia 失败，用 Unsplash 备用
-    const fallback = document.createElement('img');
-    fallback.className = 'venue-modal-img';
-    fallback.alt = name;
-    fallback.onload = () => { loader.replaceWith(fallback); };
-    fallback.onerror = () => { loader.innerHTML = '😔 暂时无法加载场馆图片，请稍后重试'; };
-    fallback.src = `https://source.unsplash.com/800x500/?stadium,${encodeURIComponent(name)},aerial`;
-    loader.replaceWith(fallback);
-  };
-
-  // 先尝试 Wikipedia API
-  fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${wikiPage}`)
-    .then(r => r.json())
-    .then(data => {
-      if (data.thumbnail && data.thumbnail.source) {
-        img.src = data.thumbnail.source;
-      } else {
-        img.onerror(); // 触发备用
-      }
-    })
-    .catch(() => img.onerror());
+  img.onerror = () => { loader.innerHTML = '😔 图片加载失败，请刷新重试'; };
 }
 
 function renderVenues() {
