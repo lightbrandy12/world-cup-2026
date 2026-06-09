@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026 美加墨世界杯 · 完整赛程</title>
+<style>
+/* ===== Reset & Base ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --pitch: #1b5e20; --pitch-light: #2e7d32; --gold: #c8a84e;
+  --gold-light: #f0d78c; --white: #ffffff; --bg: #f5f5f0;
+  --card: #ffffff; --text: #1a1a1a; --text-muted: #666;
+  --border: #e0d8c8; --accent: #c62828; --radius: 12px;
+  --shadow: 0 2px 12px rgba(0,0,0,.08);
+}
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== Header ===== */
+.header {
+  background:
+    linear-gradient(180deg, rgba(0,0,0,.55) 0%, rgba(0,40,0,.4) 50%, rgba(0,15,0,.6) 100%),
+    repeating-linear-gradient(90deg, transparent, transparent 36px, rgba(255,255,255,.015) 36px, rgba(255,255,255,.015) 72px),
+    radial-gradient(ellipse at 50% 55%, #1b5e20 0%, #0d3b0d 60%, #061a06 100%) center/cover no-repeat;
+  color: white; padding: 28px 20px 24px; text-align: center;
+  position: relative; overflow: hidden; min-height: 240px;
+}
+/* 微弱的顶部光晕，提升文字可读性 */
+.header::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(ellipse at 50% 30%, rgba(255,255,255,.08) 0%, transparent 70%);
+}
+.header::after { display: none; }
+.header-content { position: relative; z-index: 2; }
+.header h1 { font-size: clamp(20px, 5vw, 32px); font-weight: 800; letter-spacing: 1px; text-shadow: 0 2px 8px rgba(0,0,0,.4); }
+.header h1 .gold { color: #ffe082; }
+.header .subtitle { font-size: 13px; opacity: .9; margin-top: 4px; text-shadow: 0 1px 4px rgba(0,0,0,.3); }
+.header .dates { font-size: 12px; opacity: .75; margin-top: 2px; }
+
+/* Countdown */
+.countdown-bar {
+  display: flex; justify-content: center; gap: 12px; margin-top: 14px; flex-wrap: wrap;
+  position: relative; z-index: 2;
+}
+.countdown-item {
+  background: rgba(0,0,0,.25); backdrop-filter: blur(6px);
+  border-radius: 12px; padding: 10px 14px; min-width: 60px; text-align: center;
+  border: 1px solid rgba(255,255,255,.18);
+}
+.countdown-item .num { font-size: 26px; font-weight: 800; line-height: 1; }
+.countdown-item .label { font-size: 10px; opacity: .8; margin-top: 3px; }
+
+/* 体育卡气泡 */
+.sports-card-badge {
+  display: inline-flex; align-items: center; gap: 6px; margin-top: 12px; position: relative; z-index: 2;
+  background: linear-gradient(135deg, #ff6f00, #ff8f00); color: #fff;
+  padding: 8px 18px; border-radius: 24px; font-size: 12px; font-weight: 700;
+  box-shadow: 0 3px 14px rgba(255,111,0,.4); animation: badgeBounce 2s ease-in-out infinite;
+  cursor: default;
+}
+@keyframes badgeBounce {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+/* ===== Tabs ===== */
+.tabs { display: flex; gap: 2px; background: #e8e4d8; padding: 4px; margin: 16px 16px 0; border-radius: 10px; overflow-x: auto; }
+.tab {
+  flex: 1; min-width: 80px; padding: 10px 14px; text-align: center; border-radius: 8px;
+  border: none; cursor: pointer; font-size: 14px; font-weight: 600; white-space: nowrap;
+  background: transparent; color: var(--text-muted); transition: all .2s;
+}
+.tab.active { background: var(--pitch); color: white; box-shadow: 0 2px 8px rgba(27,94,32,.3); }
+.tab:hover:not(.active) { background: rgba(0,0,0,.05); }
+
+/* ===== Filter Chips ===== */
+.filters { padding: 12px 16px; display: flex; gap: 8px; flex-wrap: wrap; }
+.filter-chip {
+  padding: 6px 14px; border-radius: 20px; border: 1.5px solid var(--border);
+  background: var(--card); font-size: 13px; cursor: pointer; transition: all .2s;
+  white-space: nowrap; color: var(--text-muted);
+}
+.filter-chip.active { background: var(--pitch); color: white; border-color: var(--pitch); }
+.filter-chip:hover:not(.active) { border-color: var(--pitch); color: var(--pitch); }
+
+/* ===== Match List ===== */
+.match-list { padding: 0 16px 80px; max-width: 800px; margin: 0 auto; }
+
+/* Date divider */
+.date-divider {
+  display: flex; align-items: center; gap: 12px; margin: 20px 0 12px;
+  color: var(--text-muted); font-size: 13px; font-weight: 600;
+}
+.date-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* Match card */
+.match-card {
+  background: var(--card); border-radius: var(--radius); padding: 16px;
+  margin-bottom: 10px; box-shadow: var(--shadow); cursor: default;
+  transition: transform .15s, box-shadow .15s; position: relative; overflow: hidden;
+  border-left: 4px solid transparent;
+}
+.match-card:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(0,0,0,.12); }
+.match-card.stage-group { border-left-color: #4caf50; }
+.match-card.stage-r32  { border-left-color: #2196f3; }
+.match-card.stage-r16  { border-left-color: #ff9800; }
+.match-card.stage-qf   { border-left-color: #9c27b0; }
+.match-card.stage-sf   { border-left-color: #e91e63; }
+.match-card.stage-3rd  { border-left-color: #607d8b; }
+.match-card.stage-final { border-left-color: #c8a84e; }
+
+.match-meta {
+  display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
+  font-size: 12px; color: var(--text-muted);
+}
+.match-meta .stage-badge {
+  background: var(--pitch); color: white; padding: 2px 10px; border-radius: 4px;
+  font-weight: 700; font-size: 13px;
+}
+.group-prefix {
+  display: inline-block; background: #e8f5e9; color: var(--pitch);
+  padding: 1px 6px; border-radius: 3px; font-size: 11px; font-weight: 700;
+  margin-right: 2px; vertical-align: middle;
+}
+.match-teams { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.team {
+  flex: 1; text-align: center; font-weight: 700; font-size: 15px; line-height: 1.3;
+}
+.team .flag { font-size: 28px; display: block; margin-bottom: 2px; }
+.team .name { display: block; }
+.match-vs { font-size: 13px; color: var(--text-muted); font-weight: 600; flex-shrink: 0; }
+.match-info {
+  margin-top: 8px; padding-top: 8px; border-top: 1px solid #f0ebe0;
+  display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted);
+  flex-wrap: wrap; gap: 4px;
+}
+.match-story {
+  margin-top: 10px; padding: 8px 12px; background: #fdfaf3; border-radius: 6px;
+  font-size: 12px; color: #5d4e37; line-height: 1.6; text-align: center;
+  border-bottom: 2px solid var(--gold-light);
+}
+.match-info .venue { display: flex; align-items: center; gap: 4px; }
+.match-info .time-local { font-weight: 600; color: var(--accent); }
+
+/* Live dot */
+.live-dot {
+  width: 8px; height: 8px; border-radius: 50%; background: #f44336;
+  display: inline-block; animation: pulse 1.5s infinite; margin-right: 4px;
+}
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+/* Past match */
+.match-card.past { opacity: .6; }
+
+/* ===== Knockout Bracket ===== */
+.bracket-container { overflow-x: auto; padding: 16px 0 40px; }
+.bracket { display: flex; gap: 8px; min-width: max-content; padding: 0 16px; }
+.bracket-col { display: flex; flex-direction: column; gap: 6px; min-width: 170px; }
+.bracket-col-header {
+  font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted);
+  margin-bottom: 4px; text-align: center; letter-spacing: .5px;
+}
+.bracket-match {
+  background: var(--card); border-radius: 8px; padding: 10px 12px;
+  box-shadow: var(--shadow); font-size: 12px; position: relative;
+  border-left: 3px solid var(--border); min-height: 54px;
+  display: flex; flex-direction: column; justify-content: center; gap: 2px;
+}
+.bracket-match .bm-slot { color: var(--text-muted); font-size: 10px; }
+.bracket-match .bm-teams { font-weight: 600; font-size: 13px; }
+.bracket-match .bm-info { font-size: 10px; color: var(--text-muted); }
+.bracket-col.r32 .bracket-match { border-left-color: #2196f3; }
+.bracket-col.r16 .bracket-match { border-left-color: #ff9800; }
+.bracket-col.qf   .bracket-match { border-left-color: #9c27b0; }
+.bracket-col.sf   .bracket-match { border-left-color: #e91e63; }
+.bracket-col.final .bracket-match { border-left-color: var(--gold); background: linear-gradient(135deg, #fffef5, #fff8e1); }
+
+.bracket-label {
+  text-align: center; font-size: 11px; font-weight: 700; color: var(--gold);
+  margin-top: 6px; letter-spacing: 1px;
+}
+
+/* ===== Venue Section ===== */
+.venue-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 8px; padding: 8px 0; }
+.venue-card {
+  background: var(--card); border-radius: 10px; padding: 12px 14px; box-shadow: var(--shadow);
+  display: flex; align-items: center; gap: 10px; font-size: 13px;
+}
+.venue-card .vc-icon { font-size: 24px; }
+.venue-card .vc-name { font-weight: 600; }
+.venue-card .vc-city { color: var(--text-muted); font-size: 11px; }
+
+/* ===== Stats ===== */
+.stats-bar {
+  display: flex; justify-content: center; gap: 24px; flex-wrap: wrap;
+  padding: 12px 16px; font-size: 13px; color: var(--text-muted);
+}
+.stats-bar span { font-weight: 700; color: var(--text); }
+
+/* ===== Footer ===== */
+.footer {
+  text-align: center; padding: 24px 16px; font-size: 12px; color: var(--text-muted);
+  border-top: 1px solid var(--border);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 600px) {
+  .header { padding: 20px 8px 18px; min-height: 200px; }
+  .header h1 { font-size: 18px; }
+  .header .subtitle { font-size: 11px; }
+  .countdown-item { min-width: 52px; padding: 8px 10px; }
+  .countdown-item .num { font-size: 22px; }
+  .match-teams { gap: 4px; }
+  .team { font-size: 13px; }
+  .team .flag { font-size: 24px; }
+  .tabs { margin: 12px 8px 0; }
+  .match-list { padding: 0 8px 80px; }
+  .match-story { font-size: 11px; padding: 6px 8px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== Header ===== -->
+<header class="header">
+  <div class="header-content">
+    <h1>🏆 <span class="gold">2026</span> 美加墨世界杯</h1>
+    <p class="subtitle">FIFA World Cup 2026™ · 美国 · 加拿大 · 墨西哥</p>
+    <p class="dates">📅 6月11日 – 7月19日（北京时间 6月12日 – 7月20日）</p>
+    <div class="countdown-bar" id="countdown">
+      <div class="countdown-item"><div class="num" id="cd-days">--</div><div class="label">天</div></div>
+      <div class="countdown-item"><div class="num" id="cd-hours">--</div><div class="label">时</div></div>
+      <div class="countdown-item"><div class="num" id="cd-mins">--</div><div class="label">分</div></div>
+      <div class="countdown-item"><div class="num" id="cd-secs">--</div><div class="label">秒</div></div>
+    </div>
+    <p style="font-size:12px;opacity:.7;margin-top:6px;" id="countdown-label">距揭幕战</p>
+    <!-- 体育卡气泡 -->
+    <div class="sports-card-badge" onclick="alert('温州移动用户免费领一年体育卡！\n\n🎯 可看：世界杯、NBA、五大联赛、中超、UFC、乒乓球、网球等\n📱 只要是温州移动号码即可领取\n📍 前往温州移动营业厅或拨打10086咨询\n⚠️ 活动详情以移动官方为准')">
+      🎁 温州移动 · 体育卡免费领一年
+    </div>
+  </div>
+</header>
+
+<!-- ===== Tabs ===== -->
+<nav class="tabs" id="tabs">
+  <button class="tab active" data-tab="all">📋 全部赛程</button>
+  <button class="tab" data-tab="group">🏟 小组赛</button>
+  <button class="tab" data-tab="knockout">🏆 淘汰赛</button>
+  <button class="tab" data-tab="venues">📍 场馆</button>
+</nav>
+
+<!-- ===== Filters ===== -->
+<div class="filters" id="filter-groups"></div>
+<div class="stats-bar" id="stats"></div>
+
+<!-- ===== Content ===== -->
+<div class="match-list" id="match-list"></div>
+<div id="bracket-view" style="display:none;"></div>
+<div id="venue-view" style="display:none;"></div>
+
+<footer class="footer">
+  数据来源：FIFA 官方赛程 · 2026 美加墨世界杯™ · 共 48 支球队 · 104 场比赛<br>
+  小组赛 72 场 + 淘汰赛 32 场 · 北京时间显示
+</footer>
+
+<script>
+// ===== DATA =====
+const GROUPS = {
+  A: ['🇲🇽 墨西哥','🇿🇦 南非','🇰🇷 韩国','🇨🇿 捷克'],
+  B: ['🇨🇦 加拿大','🇧🇦 波黑','🇶🇦 卡塔尔','🇨🇭 瑞士'],
+  C: ['🇧🇷 巴西','🇲🇦 摩洛哥','🇭🇹 海地','🏴󠁧󠁢󠁳󠁣󠁴󠁿 苏格兰'],
+  D: ['🇺🇸 美国','🇵🇾 巴拉圭','🇦🇺 澳大利亚','🇹🇷 土耳其'],
+  E: ['🇩🇪 德国','🇨🇼 库拉索','🇨🇮 科特迪瓦','🇪🇨 厄瓜多尔'],
+  F: ['🇳🇱 荷兰','🇯🇵 日本','🇸🇪 瑞典','🇹🇳 突尼斯'],
+  G: ['🇧🇪 比利时','🇪🇬 埃及','🇮🇷 伊朗','🇳🇿 新西兰'],
+  H: ['🇪🇸 西班牙','🇨🇻 佛得角','🇸🇦 沙特','🇺🇾 乌拉圭'],
+  I: ['🇫🇷 法国','🇸🇳 塞内加尔','🇮🇶 伊拉克','🇳🇴 挪威'],
+  J: ['🇦🇷 阿根廷','🇩🇿 阿尔及利亚','🇦🇹 奥地利','🇯🇴 约旦'],
+  K: ['🇵🇹 葡萄牙','🇨🇩 刚果(金)','🇺🇿 乌兹别克斯坦','🇨🇴 哥伦比亚'],
+  L: ['🏴󠁧󠁢󠁥󠁮󠁧󠁿 英格兰','🇭🇷 克罗地亚','🇬🇭 加纳','🇵🇦 巴拿马'],
+};
+
+// Match data: [date_bj, time_bj, team1, team2, group, venue_city, venue_name, stage]
+// stage: 'group', 'r32', 'r16', 'qf', 'sf', '3rd', 'final'
+const MATCHES = [
+  // === GROUP STAGE (72 matches) ===
+  // Matchday 1: 6/12 - 6/18
+  ['6月12日','03:00','🇲🇽 墨西哥','🇿🇦 南非','A','墨西哥城','阿兹特克体育场','group'],
+  ['6月12日','10:00','🇰🇷 韩国','🇨🇿 捷克','A','瓜达拉哈拉','阿克伦体育场','group'],
+  ['6月13日','03:00','🇨🇦 加拿大','🇧🇦 波黑','B','多伦多','BMO球场','group'],
+  ['6月13日','09:00','🇺🇸 美国','🇵🇾 巴拉圭','D','洛杉矶','SoFi体育场','group'],
+  ['6月14日','03:00','🇶🇦 卡塔尔','🇨🇭 瑞士','B','旧金山','李维斯体育场','group'],
+  ['6月14日','06:00','🇧🇷 巴西','🇲🇦 摩洛哥','C','纽约/新泽西','大都会人寿体育场','group'],
+  ['6月14日','09:00','🇭🇹 海地','🏴󠁧󠁢󠁳󠁣󠁴󠁿 苏格兰','C','波士顿','吉列体育场','group'],
+  ['6月14日','12:00','🇦🇺 澳大利亚','🇹🇷 土耳其','D','温哥华','BC Place','group'],
+  ['6月15日','01:00','🇩🇪 德国','🇨🇼 库拉索','E','休斯顿','NRG体育场','group'],
+  ['6月15日','04:00','🇳🇱 荷兰','🇯🇵 日本','F','达拉斯','AT&T体育场','group'],
+  ['6月15日','07:00','🇨🇮 科特迪瓦','🇪🇨 厄瓜多尔','E','费城','林肯金融体育场','group'],
+  ['6月15日','10:00','🇸🇪 瑞典','🇹🇳 突尼斯','F','蒙特雷','BBVA体育场','group'],
+  ['6月16日','00:00','🇪🇸 西班牙','🇨🇻 佛得角','H','亚特兰大','梅赛德斯-奔驰体育场','group'],
+  ['6月16日','03:00','🇧🇪 比利时','🇪🇬 埃及','G','西雅图','流明球场','group'],
+  ['6月16日','06:00','🇸🇦 沙特','🇺🇾 乌拉圭','H','迈阿密','硬石体育场','group'],
+  ['6月16日','09:00','🇮🇷 伊朗','🇳🇿 新西兰','G','洛杉矶','SoFi体育场','group'],
+  ['6月17日','03:00','🇫🇷 法国','🇸🇳 塞内加尔','I','纽约/新泽西','大都会人寿体育场','group'],
+  ['6月17日','06:00','🇮🇶 伊拉克','🇳🇴 挪威','I','波士顿','吉列体育场','group'],
+  ['6月17日','09:00','🇦🇷 阿根廷','🇩🇿 阿尔及利亚','J','堪萨斯城','箭头体育场','group'],
+  ['6月17日','12:00','🇦🇹 奥地利','🇯🇴 约旦','J','旧金山','李维斯体育场','group'],
+  ['6月18日','01:00','🇵🇹 葡萄牙','🇨🇩 刚果(金)','K','休斯顿','NRG体育场','group'],
+  ['6月18日','03:00','🏴󠁧󠁢󠁥󠁮󠁧󠁿 英格兰','🇭🇷 克罗地亚','L','达拉斯','AT&T体育场','group'],
+  ['6月18日','07:00','🇬🇭 加纳','🇵🇦 巴拿马','L','多伦多','BMO球场','group'],
+  ['6月18日','10:00','🇺🇿 乌兹别克斯坦','🇨🇴 哥伦比亚','K','墨西哥城','阿兹特克体育场','group'],
+
+  // Matchday 2: 6/19 - 6/24
+  ['6月19日','09:00','🇲🇽 墨西哥','🇰🇷 韩国','A','瓜达拉哈拉','阿克伦体育场','group'],
+  ['6月19日','06:00','🇨🇿 捷克','🇿🇦 南非','A','亚特兰大','梅赛德斯-奔驰体育场','group'],
+  ['6月19日','03:00','🇨🇭 瑞士','🇧🇦 波黑','B','洛杉矶','SoFi体育场','group'],
+  ['6月19日','12:00','🇨🇦 加拿大','🇶🇦 卡塔尔','B','温哥华','BC Place','group'],
+  ['6月20日','06:00','🏴󠁧󠁢󠁳󠁣󠁴󠁿 苏格兰','🇲🇦 摩洛哥','C','波士顿','吉列体育场','group'],
+  ['6月20日','09:00','🇧🇷 巴西','🇭🇹 海地','C','费城','林肯金融体育场','group'],
+  ['6月20日','03:00','🇹🇷 土耳其','🇵🇾 巴拉圭','D','旧金山','李维斯体育场','group'],
+  ['6月20日','12:00','🇺🇸 美国','🇦🇺 澳大利亚','D','西雅图','流明球场','group'],
+  ['6月21日','03:00','🇩🇪 德国','🇨🇮 科特迪瓦','E','多伦多','BMO球场','group'],
+  ['6月21日','09:00','🇪🇨 厄瓜多尔','🇨🇼 库拉索','E','堪萨斯城','箭头体育场','group'],
+  ['6月21日','06:00','🇳🇱 荷兰','🇸🇪 瑞典','F','休斯顿','NRG体育场','group'],
+  ['6月21日','12:00','🇹🇳 突尼斯','🇯🇵 日本','F','蒙特雷','BBVA体育场','group'],
+  ['6月22日','03:00','🇧🇪 比利时','🇮🇷 伊朗','G','洛杉矶','SoFi体育场','group'],
+  ['6月22日','09:00','🇳🇿 新西兰','🇪🇬 埃及','G','温哥华','BC Place','group'],
+  ['6月22日','06:00','🇪🇸 西班牙','🇸🇦 沙特','H','亚特兰大','梅赛德斯-奔驰体育场','group'],
+  ['6月22日','12:00','🇺🇾 乌拉圭','🇨🇻 佛得角','H','迈阿密','硬石体育场','group'],
+  ['6月23日','03:00','🇫🇷 法国','🇮🇶 伊拉克','I','费城','林肯金融体育场','group'],
+  ['6月23日','09:00','🇳🇴 挪威','🇸🇳 塞内加尔','I','纽约/新泽西','大都会人寿体育场','group'],
+  ['6月23日','06:00','🇦🇷 阿根廷','🇦🇹 奥地利','J','达拉斯','AT&T体育场','group'],
+  ['6月23日','12:00','🇯🇴 约旦','🇩🇿 阿尔及利亚','J','旧金山','李维斯体育场','group'],
+  ['6月24日','03:00','🇵🇹 葡萄牙','🇺🇿 乌兹别克斯坦','K','休斯顿','NRG体育场','group'],
+  ['6月24日','09:00','🇨🇴 哥伦比亚','🇨🇩 刚果(金)','K','瓜达拉哈拉','阿克伦体育场','group'],
+  ['6月24日','06:00','🏴󠁧󠁢󠁥󠁮󠁧󠁿 英格兰','🇬🇭 加纳','L','波士顿','吉列体育场','group'],
+  ['6月24日','12:00','🇵🇦 巴拿马','🇭🇷 克罗地亚','L','多伦多','BMO球场','group'],
+
+  // Matchday 3: 6/25 - 6/28
+  ['6月25日','09:00','🇿🇦 南非','🇰🇷 韩国','A','蒙特雷','BBVA体育场','group'],
+  ['6月25日','09:00','🇨🇿 捷克','🇲🇽 墨西哥','A','墨西哥城','阿兹特克体育场','group'],
+  ['6月25日','06:00','🇨🇭 瑞士','🇨🇦 加拿大','B','温哥华','BC Place','group'],
+  ['6月25日','06:00','🇧🇦 波黑','🇶🇦 卡塔尔','B','西雅图','流明球场','group'],
+  ['6月25日','03:00','🏴󠁧󠁢󠁳󠁣󠁴󠁿 苏格兰','🇧🇷 巴西','C','迈阿密','硬石体育场','group'],
+  ['6月25日','03:00','🇲🇦 摩洛哥','🇭🇹 海地','C','亚特兰大','梅赛德斯-奔驰体育场','group'],
+  ['6月26日','09:00','🇹🇷 土耳其','🇺🇸 美国','D','洛杉矶','SoFi体育场','group'],
+  ['6月26日','09:00','🇵🇾 巴拉圭','🇦🇺 澳大利亚','D','旧金山','李维斯体育场','group'],
+  ['6月26日','06:00','🇪🇨 厄瓜多尔','🇩🇪 德国','E','纽约/新泽西','大都会人寿体育场','group'],
+  ['6月26日','06:00','🇨🇼 库拉索','🇨🇮 科特迪瓦','E','费城','林肯金融体育场','group'],
+  ['6月26日','03:00','🇯🇵 日本','🇸🇪 瑞典','F','达拉斯','AT&T体育场','group'],
+  ['6月26日','03:00','🇹🇳 突尼斯','🇳🇱 荷兰','F','堪萨斯城','箭头体育场','group'],
+  ['6月27日','09:00','🇪🇬 埃及','🇮🇷 伊朗','G','西雅图','流明球场','group'],
+  ['6月27日','09:00','🇳🇿 新西兰','🇧🇪 比利时','G','温哥华','BC Place','group'],
+  ['6月27日','06:00','🇨🇻 佛得角','🇸🇦 沙特','H','休斯顿','NRG体育场','group'],
+  ['6月27日','06:00','🇺🇾 乌拉圭','🇪🇸 西班牙','H','瓜达拉哈拉','阿克伦体育场','group'],
+  ['6月27日','03:00','🇳🇴 挪威','🇫🇷 法国','I','波士顿','吉列体育场','group'],
+  ['6月27日','03:00','🇸🇳 塞内加尔','🇮🇶 伊拉克','I','多伦多','BMO球场','group'],
+  ['6月28日','09:00','🇩🇿 阿尔及利亚','🇦🇹 奥地利','J','堪萨斯城','箭头体育场','group'],
+  ['6月28日','09:00','🇯🇴 约旦','🇦🇷 阿根廷','J','达拉斯','AT&T体育场','group'],
+  ['6月28日','06:00','🇨🇴 哥伦比亚','🇵🇹 葡萄牙','K','迈阿密','硬石体育场','group'],
+  ['6月28日','06:00','🇨🇩 刚果(金)','🇺🇿 乌兹别克斯坦','K','亚特兰大','梅赛德斯-奔驰体育场','group'],
+  ['6月28日','03:00','🇵🇦 巴拿马','🏴󠁧󠁢󠁥󠁮󠁧󠁿 英格兰','L','纽约/新泽西','大都会人寿体育场','group'],
+  ['6月28日','03:00','🇭🇷 克罗地亚','🇬🇭 加纳','L','费城','林肯金融体育场','group'],
+
+  // === ROUND OF 32 (16 matches, 6/29 - 7/4) ===
+  ['6月29日','00:00','A组第1','B组第3/C组第3/D组第3','-','R32','—','待定','r32'],
+  ['6月29日','03:00','C组第1','A组第3/B组第3/F组第3','-','R32','—','待定','r32'],
+  ['6月29日','06:00','B组第1','A组第3/E组第3/F组第3','-','R32','—','待定','r32'],
+  ['6月29日','09:00','F组第1','A组第3/B组第3/C组第3','-','R32','—','待定','r32'],
+  ['6月30日','00:00','D组第1','B组第3/E组第3/F组第3','-','R32','—','待定','r32'],
+  ['6月30日','03:00','E组第1','A组第3/B组第3/I组第3','-','R32','—','待定','r32'],
+  ['6月30日','06:00','G组第1','C组第3/D组第3/E组第3','-','R32','—','待定','r32'],
+  ['6月30日','09:00','I组第1','C组第3/D组第3/G组第3','-','R32','—','待定','r32'],
+  ['7月1日','00:00','H组第1','D组第3/E组第3/I组第3','-','R32','—','待定','r32'],
+  ['7月1日','03:00','J组第1','C组第3/F组第3/H组第3','-','R32','—','待定','r32'],
+  ['7月1日','06:00','K组第1','D组第3/E组第3/J组第3','-','R32','—','待定','r32'],
+  ['7月1日','09:00','L组第1','E组第3/H组第3/I组第3','-','R32','—','待定','r32'],
+  ['7月2日','00:00','A组第2','C组第2','-','R32','—','待定','r32'],
+  ['7月2日','03:00','B组第2','F组第2','-','R32','—','待定','r32'],
+  ['7月2日','06:00','D组第2','G组第2','-','R32','—','待定','r32'],
+  ['7月2日','09:00','E组第2','I组第2','-','R32','—','待定','r32'],
+
+  // === ROUND OF 16 (8 matches, 7/4 - 7/7) ===
+  ['7月4日','00:00','R32胜者','R32胜者','-','R16','—','待定','r16'],
+  ['7月4日','03:00','R32胜者','R32胜者','-','R16','—','待定','r16'],
+  ['7月5日','00:00','R32胜者','R32胜者','-','R16','—','待定','r16'],
+  ['7月5日','03:00','R32胜者','R32胜者','-','R16','—','待定','r16'],
+  ['7月5日','06:00','R32胜者','R32胜者','-','R16','—','待定','r16'],
+  ['7月5日','09:00','R32胜者','R32胜者','-','R16','—','待定','r16'],
+  ['7月6日','00:00','R32胜者','R32胜者','-','R16','—','待定','r16'],
+  ['7月6日','03:00','R32胜者','R32胜者','-','R16','—','待定','r16'],
+
+  // === QUARTERFINALS (4 matches, 7/9 - 7/11) ===
+  ['7月9日','03:00','R16胜者','R16胜者','-','QF','波士顿','吉列体育场','qf'],
+  ['7月10日','03:00','R16胜者','R16胜者','-','QF','洛杉矶','SoFi体育场','qf'],
+  ['7月11日','03:00','R16胜者','R16胜者','-','QF','迈阿密','硬石体育场','qf'],
+  ['7月11日','06:00','R16胜者','R16胜者','-','QF','堪萨斯城','箭头体育场','qf'],
+
+  // === SEMIFINALS (2 matches) ===
+  ['7月14日','03:00','QF胜者','QF胜者','-','SF','达拉斯','AT&T体育场','sf'],
+  ['7月15日','03:00','QF胜者','QF胜者','-','SF','亚特兰大','梅赛德斯-奔驰体育场','sf'],
+
+  // === THIRD PLACE ===
+  ['7月18日','04:00','SF败者','SF败者','-','季军战','迈阿密','硬石体育场','3rd'],
+
+  // === FINAL ===
+  ['7月19日','03:00','SF胜者','SF胜者','-','🏆 决赛','纽约/新泽西','大都会人寿体育场','final'],
+];
+
+const VENUES = [
+  ['🇲🇽','墨西哥城','阿兹特克体育场','87,523'],
+  ['🇺🇸','纽约/新泽西','大都会人寿体育场','82,500'],
+  ['🇺🇸','达拉斯','AT&T体育场','80,000'],
+  ['🇺🇸','堪萨斯城','箭头体育场','76,416'],
+  ['🇺🇸','休斯顿','NRG体育场','72,220'],
+  ['🇺🇸','亚特兰大','梅赛德斯-奔驰体育场','71,000'],
+  ['🇺🇸','洛杉矶','SoFi体育场','70,240'],
+  ['🇺🇸','费城','林肯金融体育场','69,176'],
+  ['🇺🇸','西雅图','流明球场','69,000'],
+  ['🇺🇸','旧金山','李维斯体育场','68,500'],
+  ['🇺🇸','波士顿','吉列体育场','65,878'],
+  ['🇺🇸','迈阿密','硬石体育场','64,767'],
+  ['🇨🇦','温哥华','BC Place','54,500'],
+  ['🇨🇦','多伦多','BMO球场','45,500'],
+  ['🇲🇽','蒙特雷','BBVA体育场','53,500'],
+  ['🇲🇽','瓜达拉哈拉','阿克伦体育场','48,071'],
+];
+
+const STAGE_NAMES = { group:'小组赛', r32:'1/16决赛', r16:'1/8决赛', qf:'1/4决赛', sf:'半决赛', '3rd':'季军战', final:'🏆 决赛' };
+const KNOCKOUT_DATES = {
+  r32: '6月29日 – 7月2日', r16: '7月4日 – 7月6日', qf: '7月9日 – 7月11日',
+  sf: '7月14日 – 7月15日', '3rd': '7月18日', final: '7月19日',
+};
+
+// ===== STATE =====
+let activeTab = 'all';
+let activeGroup = null; // null = all groups
+let matches = MATCHES;
+
+// ===== RENDER =====
+function getNowBJ() {
+  // Beijing is UTC+8
+  const now = new Date();
+  const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+  return new Date(utc + 8 * 3600000);
+}
+
+function parseDateBJ(dateStr, timeStr) {
+  const [m, d] = dateStr.replace('月',' ').replace('日','').trim().split(/\s+/);
+  const [h, min] = timeStr.split(':');
+  // Month: 6 or 7
+  return new Date(2026, parseInt(m) - 1, parseInt(d), parseInt(h), parseInt(min), 0);
+}
+
+function isPastMatch(m) {
+  const dt = parseDateBJ(m[0], m[1]);
+  return dt < getNowBJ();
+}
+
+function isLiveMatch(m) {
+  const start = parseDateBJ(m[0], m[1]);
+  const end = new Date(start.getTime() + 2.5 * 3600000); // ~2.5h match
+  const now = getNowBJ();
+  return now >= start && now <= end;
+}
+
+// ===== 对阵故事/看点 =====
+function getMatchStory(t1, t2, stage, group) {
+  // 提取纯队名：格式为 "🇲🇽 墨西哥"，取空格后最后一段即可
+  const clean = s => { const p = s.split(' '); return p[p.length - 1]; };
+  const a = clean(t1), b = clean(t2);
+  const key = [a, b].sort().join('|');
+
+  const stories = {
+    // ===== A组 =====
+    '墨西哥|南非': '2010年南非世界杯揭幕战，东道主南非1-1逼平墨西哥。16年后角色互换，墨西哥坐镇阿兹特克主场，能否延续揭幕战不败传统？',
+    '韩国|捷克': '韩国队拥有孙兴慜这位世界级前锋，而捷克自1990年后重返世界杯舞台。亚洲铁血 vs 东欧硬朗，两种足球哲学的碰撞。',
+    '捷克|南非': '捷克时隔36年再战世界杯，南非则带着非洲雄风而来。两队均非小组出线热门，这场直接对话很可能决定生死。',
+    '韩国|墨西哥': '两队近年在世界杯多次交手，2018年墨西哥2-1胜。孙兴慜领衔的韩国能否在美洲大陆复仇？阿兹特克高原将是关键变数。',
+    '捷克|墨西哥': '东道主墨西哥小组收官战，全场近9万球迷的声浪将是第12人。捷克若想出线，或许需要在这片魔鬼主场创造奇迹。',
+    '韩国|南非': '南非曾在2010年让世界惊艳，韩国则连续11届闯入世界杯。谁能用速度与激情点燃蒙特雷的夜空？',
+
+    // ===== B组 =====
+    '加拿大|波黑': '加拿大时隔36年重返世界杯，更是东道主之一。波黑第三次参赛经验更丰富，阿方索·戴维斯将是全场焦点。',
+    '卡塔尔|瑞士': '卡塔尔携亚洲杯冠军余威而来，瑞士则连续6届大赛闯入淘汰赛。技术流 vs 纪律流的典型对决。',
+    '瑞士|波黑': '欧洲内战！瑞士拥有扎卡、沙奇里等老将坐镇，波黑哲科老而弥坚。谁能在洛杉矶锁定出线主动权？',
+    '加拿大|卡塔尔': '两国近年足球投入巨大，加拿大有戴维斯、戴维双子星，卡塔尔有阿菲夫。年轻风暴的正面交锋。',
+    '瑞士|加拿大': '加拿大若想出线，此战极可能是生死战。瑞士大赛经验丰富，温哥华的加拿大球迷将营造狂热氛围。',
+    '波黑|卡塔尔': '两支期待证明自己的球队，波黑靠经验、卡塔尔靠技术。在西雅图的这场对决或许将诞生黑马。',
+
+    // ===== C组 =====
+    '巴西|摩洛哥': '巴西五星荣耀加身，摩洛哥则是上届四强最大黑马。维尼修斯 vs 阿什拉夫，皇马队友兵戎相见！',
+    '海地|苏格兰': '海地历史上第二次晋级世界杯，苏格兰则是欧洲老牌劲旅时隔28年归来。加勒比激情 vs 苏格兰铁血。',
+    '苏格兰|摩洛哥': '上届四强摩洛哥继续征途，苏格兰则渴望证明自己不只来陪跑。两队拼抢凶狠，注定火花四溅。',
+    '巴西|海地': '足球王国 vs 加勒比新军，纸面实力悬殊。但世界杯从不缺奇迹，海地人将用生命捍卫每一寸草皮。',
+    '苏格兰|巴西': '苏格兰上一次在世界杯面对巴西是1998年揭幕战，最终1-2惜败。28年后再相逢，历史能否改写？',
+    '摩洛哥|海地': '阿什拉夫领衔的摩洛哥防线能否抵挡海地的速度冲击？北非黑马 vs 加勒比旋风，风格迥异的较量。',
+
+    // ===== D组 =====
+    '美国|巴拉圭': '美国队坐拥普利西奇等旅欧球星，东道主首秀压力巨大。巴拉圭防守凶悍，专克强队。',
+    '澳大利亚|土耳其': '澳大利亚连续6届参赛经验丰富，土耳其时隔24年重返世界杯。恰尔汗奥卢的任意球将是致命武器。',
+    '土耳其|巴拉圭': '两队风格迥异：土耳其技术细腻、巴拉圭硬朗凶悍。这是欧洲拉丁派 vs 南美力量派的典型对话。',
+    '美国|澳大利亚': '美国队第二个主场，西雅图球迷将倾巢而出。澳大利亚身体对抗强悍，绝不让东道主轻松过关。',
+    '土耳其|美国': '极可能是D组头名之争！洛杉矶的星光熠熠，普利西奇 vs 恰尔汗奥卢，谁将主宰中场？',
+    '巴拉圭|澳大利亚': '两队都以铁血防守著称，这场很可能演变为肉搏战。在旧金山的较量将决定出线命运。',
+
+    // ===== E组 =====
+    '德国|库拉索': '德国战车对上人口仅15万的小国库拉索，这是巨人与大卫的对决。但库拉索球员多在荷甲踢球，绝非鱼腩。',
+    '科特迪瓦|厄瓜多尔': '非洲大象 vs 南美高原之鹰。科特迪瓦拥有多名五大联赛球员，厄瓜多尔则在世预赛表现抢眼。',
+    '德国|科特迪瓦': '德国面对非洲球队历史战绩出色，但科特迪瓦的速度型前锋是任何防线的噩梦。德意志战车需谨慎。',
+    '厄瓜多尔|库拉索': '厄瓜多尔离开高原主场威力减半，库拉索则毫无心理包袱。这是一场谁都不想输的比赛。',
+    '厄瓜多尔|德国': '德国若想锁定小组头名，此战不容有失。厄瓜多尔在世预赛曾击败阿根廷，绝非善类。',
+    '库拉索|科特迪瓦': '橙衣军团血统的库拉索 vs 非洲传统劲旅科特迪瓦。费城将见证两支不被看好球队的殊死一搏。',
+
+    // ===== F组 =====
+    '荷兰|日本': '2018年世界杯日本曾2-0领先比利时，留给世界深刻印象。如今对战另一低地豪强荷兰，蓝武士能否再创奇迹？',
+    '瑞典|突尼斯': '北欧力量 vs 北非技术。瑞典没有了伊布反而更加团结，突尼斯则希望打破小组赛不胜魔咒。',
+    '荷兰|瑞典': '欧洲传统两强的直接对话。范戴克领衔的防线 vs 瑞典的定位球战术，谁将笑到最后？',
+    '突尼斯|日本': '日本技术流面对突尼斯的身体对抗，两种截然不同的足球文化。蓝武士能否扛住北非的冲击？',
+    '日本|瑞典': '日本队小组赛最后一战，2018年他们曾差点闯入八强。面对高大的瑞典防线，日本的速度和灵巧是突破口。',
+    '突尼斯|荷兰': '突尼斯从不畏惧强敌，荷兰则需要一场胜利锁定出线。经典攻防战即将在堪萨斯城上演。',
+
+    // ===== G组 =====
+    '比利时|埃及': '黄金一代德布劳内、卢卡库的最后一舞，萨拉赫则肩负整个埃及的希望。两位英超传奇的对决！',
+    '伊朗|新西兰': '伊朗连续4届参赛经验丰富，新西兰则自2010年后重返世界杯。亚洲劲旅 vs 大洋洲霸主。',
+    '比利时|伊朗': '伊朗在2018和2022两届世界杯均险些出线，防守极其顽强。比利时的进攻创造力将经受考验。',
+    '新西兰|埃及': '除了萨拉赫，埃及还有谁能站出来？新西兰全队身价不高但斗志昂扬，温哥华之战值得期待。',
+    '埃及|伊朗': '萨拉赫 vs 塔雷米，两位亚洲/非洲顶级前锋的碰撞。这场很可能决定小组第二的归属。',
+    '新西兰|比利时': '比利时黄金一代的小组收官战。新西兰人将拼尽全力，但德布劳内的传球可能随时撕碎防线。',
+
+    // ===== H组 =====
+    '西班牙|佛得角': '西班牙传控足球 vs 佛得角世界杯首秀。佛得角全国人口不到60万，能站上这个舞台已是传奇。',
+    '沙特|乌拉圭': '沙特在2022年爆冷击败阿根廷，乌拉圭则拥有巴尔韦德、努涅斯等球星。亚洲新贵挑战南美豪门。',
+    '西班牙|沙特': '沙特近年足球投入巨大，联赛吸引了C罗等巨星。面对西班牙的传控，沙特能否再次制造冷门？',
+    '乌拉圭|佛得角': '乌拉圭两夺世界杯，佛得角首次参赛。但这支非洲岛国球队拥有多名葡萄牙联赛球员，不容小觑。',
+    '佛得角|沙特': '两支球队都有创造历史的机会。佛得角期待首胜，沙特希望继2022年后再次闯入淘汰赛。',
+    '乌拉圭|西班牙': 'H组最强两队直接对话！两队历史上交手多次，乌拉圭的铁血防守能否锁住西班牙的传控体系？',
+
+    // ===== I组 =====
+    '法国|塞内加尔': '2002年揭幕战，卫冕冠军法国0-1负于塞内加尔，制造世界杯史上最大冷门之一。24年后，姆巴佩能否率队雪耻？',
+    '伊拉克|挪威': '哈兰德的世界杯首秀！全世界的目光都将聚焦在这位挪威巨人身上。伊拉克则带来亚洲足球的坚韧。',
+    '法国|伊拉克': '卫冕冠军法国面对亚洲黑马伊拉克。姆巴佩的速度对上伊拉克的铁桶阵，矛与盾的终极较量。',
+    '挪威|塞内加尔': '哈兰德 vs 马内（若伤愈归队）的对决令人血脉偾张！两位世界级前锋将决定这场比赛的走向。',
+    '挪威|法国': 'I组最强对话！姆巴佩 vs 哈兰德——这不仅是一场小组赛，更是未来十年足坛王者的直接对话！',
+    '塞内加尔|伊拉克': '塞内加尔是上届非洲冠军，伊拉克则是亚洲足坛的坚韧代表。经验和身体对抗将决定胜负。',
+
+    // ===== J组 =====
+    '阿根廷|阿尔及利亚': '卫冕冠军阿根廷首秀！梅西的世界杯最后一舞，全球瞩目。阿尔及利亚曾在2014年将德国逼入加时。',
+    '奥地利|约旦': '奥地利在朗尼克治下打出高压足球，约旦则是亚洲杯亚军。朗尼克的战术哲学 vs 亚洲的坚韧防线。',
+    '阿根廷|奥地利': '梅西面对朗尼克的高位逼抢体系，这是两种极致足球理念的碰撞。达拉斯的德州球迷将见证经典。',
+    '约旦|阿尔及利亚': '阿拉伯世界的德比战！两支讲阿拉伯语的球队在旧金山相遇，文化和足球交织的盛宴。',
+    '阿尔及利亚|奥地利': '阿尔及利亚拥有多名法甲球星，奥地利在预选赛表现强势。出线生死战，谁都不敢退缩。',
+    '约旦|阿根廷': '极可能是梅西世界杯生涯的最后一场小组赛。约旦球员能与梅西同场竞技，这本身已成传奇。',
+
+    // ===== K组 =====
+    '葡萄牙|刚果(金)': 'C罗领衔的葡萄牙首战面对非洲劲旅。刚果(金)球员身体素质爆表，葡萄牙技术流如何应对？',
+    '乌兹别克斯坦|哥伦比亚': '乌兹别克斯坦首次闯入世界杯创造历史，哥伦比亚则有路易斯·迪亚斯等球星。中亚铁骑挑战南美雄鹰。',
+    '葡萄牙|乌兹别克斯坦': 'C罗面对世界杯新军，葡萄牙目标只有一个：全取三分。但中亚人从不轻易认输。',
+    '哥伦比亚|刚果(金)': '路易斯·迪亚斯的速度和技术是哥伦比亚最大武器。刚果(金)则期待复刻1974年扎伊尔的传奇。',
+    '哥伦比亚|葡萄牙': '极可能是K组头名之争。C罗 vs 迪亚斯，两位葡萄牙语系球星的跨洋对决，迈阿密必定沸腾。',
+    '刚果(金)|乌兹别克斯坦': '两支期待证明自己的球队。刚果(金)时隔52年重返世界杯，乌兹别克斯坦则是首秀。历史在此刻书写。',
+
+    // ===== L组 =====
+    '英格兰|克罗地亚': '2018年世界杯半决赛重演！英格兰加时2-1胜出，克罗地亚含恨。8年后再相遇，莫德里奇最后一舞。',
+    '加纳|巴拿马': '加纳在2010年曾距四强一步之遥，巴拿马第二次参赛更加成熟。非洲力量 vs 中北美新贵。',
+    '英格兰|加纳': '英格兰面对非洲球队战绩出色，但加纳的速度反击是索斯盖特防线的大考。波士顿的英伦后裔将全力助威。',
+    '巴拿马|克罗地亚': '2018年格子军团曾闯入决赛，如今莫德里奇老而弥坚。巴拿马在美洲作战，能否再创奇迹？',
+    '巴拿马|英格兰': '2018年世界杯英格兰曾6-1大胜巴拿马。8年后再度相遇，巴拿马人渴望在大都会人寿完成救赎。',
+    '克罗地亚|加纳': '莫德里奇的谢幕演出？加纳年轻风暴对上克罗地亚的经验与智慧。费城之战注定感人肺腑。',
+  };
+
+  // 淘汰赛通用看点
+  if (stage !== 'group') {
+    const stageStories = {
+      r32:  '32强淘汰赛，一战定生死！小组赛48天的拼杀只为这一刻，输球即回家。',
+      r16:  '16强战，本届世界杯真正的强者开始浮现。每一场都是决赛级别的碰撞。',
+      qf:   '八强战！距大力神杯仅三步之遥。这个阶段的每一秒都可能载入史册。',
+      sf:   '🔥 半决赛！全世界屏息以待。四年等待，90分钟决定决赛门票归属。',
+      '3rd':'季军争夺战，两支半决赛落败的球队为荣誉而战。虽非决赛，但国家荣誉高于一切。',
+      final:'👑 世界杯决赛！全球数十亿人共同见证。谁将捧起大力神杯，成为世界之王？',
+    };
+    return stageStories[stage] || '淘汰赛阶段，每一场都是生死之战。';
+  }
+
+  return stories[key] || `${group}组关键较量，两队都将为出线全力一搏。`;
+}
+
+function renderMatchCard(m, idx) {
+  const [date, time, t1, t2, group, city, venue, stage] = m;
+  const past = stage === 'group' ? isPastMatch(m) : false;
+  const live = isLiveMatch(m);
+  const label = stage === 'group' ? group + '组' : STAGE_NAMES[stage];
+  const stageClass = 'stage-' + stage.replace('3rd','3rd').replace('final','final');
+  const story = getMatchStory(t1, t2, stage, group);
+
+  // 小组赛：球队名前加组别；淘汰赛：保留阶段标签
+  const team1Name = stage === 'group' ? `<span class="group-prefix">${group}组</span> ${t1}` : t1;
+  const team2Name = stage === 'group' ? `<span class="group-prefix">${group}组</span> ${t2}` : t2;
+
+  return `
+    <div class="match-card ${stageClass}${past ? ' past' : ''}" data-idx="${idx}" data-group="${group}" data-stage="${stage}">
+      <div class="match-meta">
+        <span class="stage-badge">${label}</span>
+        <span>${date} ${live ? '<span class="live-dot"></span>' : ''}${time}（北京时间）</span>
+      </div>
+      <div class="match-teams">
+        <div class="team"><span class="name">${team1Name}</span></div>
+        <div class="match-vs">${live ? '🔴 进行中' : 'VS'}</div>
+        <div class="team"><span class="name">${team2Name}</span></div>
+      </div>
+      <div class="match-story">💬 ${story}</div>
+      <div class="match-info">
+        <span class="venue">📍 ${city} · ${venue}</span>
+        ${live ? '<span style="color:#f44336;font-weight:700;">🔴 直播中</span>' : (past ? '<span>已结束</span>' : '<span class="time-local">⏰ ' + time + '</span>')}
+      </div>
+    </div>`;
+}
+
+function groupMatchesByDate(matches) {
+  const map = new Map();
+  for (const m of matches) {
+    const key = m[0];
+    if (!map.has(key)) map.set(key, []);
+    map.get(key).push(m);
+  }
+  return map;
+}
+
+function renderMatchList(filtered) {
+  const container = document.getElementById('match-list');
+  const grouped = groupMatchesByDate(filtered);
+
+  let html = '';
+  for (const [date, ms] of grouped) {
+    html += `<div class="date-divider">📅 ${date}（北京时间）· ${ms.length} 场</div>`;
+    ms.forEach((m, i) => {
+      const globalIdx = MATCHES.indexOf(m);
+      html += renderMatchCard(m, globalIdx);
+    });
+  }
+
+  if (filtered.length === 0) {
+    html = '<div style="text-align:center;padding:40px;color:var(--text-muted);">暂无匹配的赛事</div>';
+  }
+
+  container.innerHTML = html;
+}
+
+function renderBracket() {
+  const container = document.getElementById('bracket-view');
+  const stages = [
+    { key: 'r32', label: '1/16 决赛', cls: 'r32', matches: matches.filter(m => m[7] === 'r32') },
+    { key: 'r16', label: '1/8 决赛', cls: 'r16', matches: matches.filter(m => m[7] === 'r16') },
+    { key: 'qf', label: '1/4 决赛', cls: 'qf', matches: matches.filter(m => m[7] === 'qf') },
+    { key: 'sf', label: '半决赛', cls: 'sf', matches: matches.filter(m => m[7] === 'sf') },
+    { key: 'final', label: '决赛 / 季军战', cls: 'final', matches: matches.filter(m => m[7] === '3rd' || m[7] === 'final') },
+  ];
+
+  let html = '<div class="bracket-container"><div class="bracket">';
+  for (const s of stages) {
+    html += `<div class="bracket-col ${s.cls}">`;
+    html += `<div class="bracket-col-header">${s.label}<br><small>${KNOCKOUT_DATES[s.key] || ''}</small></div>`;
+    for (const m of s.matches) {
+      const isSpecial = m[7] === 'final' || m[7] === '3rd';
+      html += `
+        <div class="bracket-match">
+          <div class="bm-slot">${isSpecial ? STAGE_NAMES[m[7]] : ''}</div>
+          <div class="bm-teams">${m[2]} vs ${m[3]}</div>
+          <div class="bm-info">${m[0]} ${m[1]} · ${m[5]}</div>
+        </div>`;
+    }
+    html += '</div>';
+  }
+  html += '</div></div>';
+  container.innerHTML = html;
+}
+
+function renderVenues() {
+  const container = document.getElementById('venue-view');
+  let html = '<div style="padding:0 16px;max-width:800px;margin:0 auto;"><h3 style="margin:16px 0 8px;">📍 16 座主办城市场馆</h3><div class="venue-grid">';
+  for (const v of VENUES) {
+    html += `
+      <div class="venue-card">
+        <div class="vc-icon">${v[0]}</div>
+        <div>
+          <div class="vc-name">${v[2]}</div>
+          <div class="vc-city">${v[1]} · 容量 ${v[3]}</div>
+        </div>
+      </div>`;
+  }
+  html += '</div></div>';
+  container.innerHTML = html;
+}
+
+function renderFilterChips() {
+  const container = document.getElementById('filter-groups');
+  let html = '<button class="filter-chip active" data-group="">全部</button>';
+  for (const g of 'ABCDEFGHIJKLMN') {
+    html += `<button class="filter-chip" data-group="${g}">${g} 组</button>`;
+  }
+  html += '<button class="filter-chip" data-group="r32">1/16 决赛</button>';
+  html += '<button class="filter-chip" data-group="r16">1/8 决赛</button>';
+  html += '<button class="filter-chip" data-group="qf">1/4 决赛</button>';
+  html += '<button class="filter-chip" data-group="sf">半决赛</button>';
+  html += '<button class="filter-chip" data-group="final">决赛</button>';
+  container.innerHTML = html;
+
+  // Bind events
+  container.querySelectorAll('.filter-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      container.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      activeGroup = chip.dataset.group || null;
+      applyFilters();
+    });
+  });
+}
+
+function applyFilters() {
+  let filtered = [...matches];
+
+  // Tab filter
+  if (activeTab === 'group') {
+    filtered = filtered.filter(m => m[7] === 'group');
+  } else if (activeTab === 'knockout') {
+    filtered = filtered.filter(m => m[7] !== 'group');
+  }
+
+  // Group filter
+  if (activeGroup) {
+    if (['r32','r16','qf','sf','final','3rd'].includes(activeGroup)) {
+      const stageKey = activeGroup === 'final' ? ['final','3rd'] : [activeGroup];
+      filtered = filtered.filter(m => stageKey.includes(m[7]));
+    } else {
+      filtered = filtered.filter(m => m[4] === activeGroup);
+    }
+  }
+
+  // Update visibility
+  document.getElementById('match-list').style.display = activeTab === 'venues' ? 'none' : 'block';
+  document.getElementById('bracket-view').style.display = activeTab === 'knockout' ? 'block' : 'none';
+  document.getElementById('venue-view').style.display = activeTab === 'venues' ? 'block' : 'none';
+  document.getElementById('filter-groups').style.display = activeTab === 'venues' ? 'none' : 'flex';
+
+  if (activeTab === 'venues') {
+    renderVenues();
+  } else {
+    renderMatchList(filtered);
+    if (activeTab === 'knockout') renderBracket();
+  }
+
+  // Update stats
+  const now = getNowBJ();
+  const pastCount = matches.filter(m => isPastMatch(m)).length;
+  const total = matches.length;
+  document.getElementById('stats').innerHTML = `
+    <span>📊 共 <b>${filtered.length}</b> 场</span>
+    <span>✅ 已赛 <b>${pastCount}</b> 场</span>
+    <span>⏳ 待赛 <b>${total - pastCount}</b> 场</span>
+    <span>🏟 总 <b>${total}</b> 场</span>
+  `;
+}
+
+// ===== COUNTDOWN =====
+function updateCountdown() {
+  // Opening match: June 12 Beijing time 03:00 = June 11 19:00 UTC
+  const openingBJ = new Date(2026, 5, 12, 3, 0, 0); // June 12, 2026 03:00 Beijing
+  const nowBJ = getNowBJ();
+  const diff = openingBJ - nowBJ;
+
+  if (diff <= 0) {
+    document.getElementById('cd-days').textContent = '0';
+    document.getElementById('cd-hours').textContent = '0';
+    document.getElementById('cd-mins').textContent = '0';
+    document.getElementById('cd-secs').textContent = '0';
+    document.getElementById('countdown-label').textContent = '🔥 世界杯已经开始！';
+    return;
+  }
+
+  const days = Math.floor(diff / 86400000);
+  const hours = Math.floor((diff % 86400000) / 3600000);
+  const mins = Math.floor((diff % 3600000) / 60000);
+  const secs = Math.floor((diff % 60000) / 1000);
+
+  document.getElementById('cd-days').textContent = days;
+  document.getElementById('cd-hours').textContent = String(hours).padStart(2,'0');
+  document.getElementById('cd-mins').textContent = String(mins).padStart(2,'0');
+  document.getElementById('cd-secs').textContent = String(secs).padStart(2,'0');
+}
+
+// ===== INIT =====
+function init() {
+  renderFilterChips();
+  applyFilters();
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+
+  // Refresh every 60s for live status
+  setInterval(applyFilters, 60000);
+
+  // Tab switching
+  document.getElementById('tabs').addEventListener('click', (e) => {
+    if (e.target.classList.contains('tab')) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      e.target.classList.add('active');
+      activeTab = e.target.dataset.tab;
+      applyFilters();
+    }
+  });
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
