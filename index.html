@@ -129,8 +129,12 @@ body {
 .match-teams { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .team {
   flex: 1; text-align: center; font-weight: 700; font-size: 15px; line-height: 1.3;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
 }
-.team .flag { font-size: 28px; display: block; margin-bottom: 2px; }
+.flag-img {
+  width: 40px; height: 28px; border-radius: 3px; box-shadow: 0 1px 3px rgba(0,0,0,.15);
+  object-fit: cover; display: block;
+}
 .team .name { display: block; }
 .match-vs { font-size: 13px; color: var(--text-muted); font-weight: 600; flex-shrink: 0; }
 .match-info {
@@ -216,7 +220,7 @@ body {
   .countdown-item .num { font-size: 22px; }
   .match-teams { gap: 4px; }
   .team { font-size: 13px; }
-  .team .flag { font-size: 24px; }
+  .flag-img { width: 32px; height: 22px; }
   .tabs { margin: 12px 8px 0; }
   .match-list { padding: 0 8px 80px; }
   .match-story { font-size: 11px; padding: 6px 8px; }
@@ -589,6 +593,31 @@ function getMatchStory(t1, t2, stage, group) {
   return stories[key] || `${group}组关键较量，两队都将为出线全力一搏。`;
 }
 
+function getCleanName(teamStr) {
+  // 从 "🇲🇽 墨西哥" 或 "墨西哥" 中提取国家名
+  const parts = teamStr.split(' ');
+  return parts[parts.length - 1];
+}
+
+// 国旗图片映射（ISO 3166-1 alpha-2）
+const FLAG_CODES = {
+  '墨西哥':'mx','南非':'za','韩国':'kr','捷克':'cz','加拿大':'ca','波黑':'ba','卡塔尔':'qa',
+  '瑞士':'ch','巴西':'br','摩洛哥':'ma','海地':'ht','苏格兰':'gb','美国':'us','巴拉圭':'py',
+  '澳大利亚':'au','土耳其':'tr','德国':'de','库拉索':'cw','科特迪瓦':'ci','厄瓜多尔':'ec',
+  '荷兰':'nl','日本':'jp','瑞典':'se','突尼斯':'tn','比利时':'be','埃及':'eg','伊朗':'ir',
+  '新西兰':'nz','西班牙':'es','佛得角':'cv','沙特':'sa','乌拉圭':'uy','法国':'fr',
+  '塞内加尔':'sn','伊拉克':'iq','挪威':'no','阿根廷':'ar','阿尔及利亚':'dz','奥地利':'at',
+  '约旦':'jo','葡萄牙':'pt','刚果(金)':'cd','乌兹别克斯坦':'uz','哥伦比亚':'co',
+  '英格兰':'gb','克罗地亚':'hr','加纳':'gh','巴拿马':'pa',
+};
+
+function getFlagImg(teamStr) {
+  const name = getCleanName(teamStr);
+  const code = FLAG_CODES[name];
+  if (!code) return '';
+  return `<img class="flag-img" src="https://flagcdn.com/40x30/${code}.png" srcset="https://flagcdn.com/80x60/${code}.png 2x" alt="${name}" loading="lazy">`;
+}
+
 function renderMatchCard(m, idx) {
   const [date, time, t1, t2, group, city, venue, stage] = m;
   const past = stage === 'group' ? isPastMatch(m) : false;
@@ -597,9 +626,12 @@ function renderMatchCard(m, idx) {
   const stageClass = 'stage-' + stage.replace('3rd','3rd').replace('final','final');
   const story = getMatchStory(t1, t2, stage, group);
 
-  // 小组赛：球队名前加组别；淘汰赛：保留阶段标签
-  const team1Name = stage === 'group' ? `<span class="group-prefix">${group}组</span> ${t1}` : t1;
-  const team2Name = stage === 'group' ? `<span class="group-prefix">${group}组</span> ${t2}` : t2;
+  // 小组赛：球队名前加组别
+  const prefix = stage === 'group' ? `<span class="group-prefix">${group}组</span> ` : '';
+  const flag1 = getFlagImg(t1);
+  const flag2 = getFlagImg(t2);
+  const name1 = getCleanName(t1);
+  const name2 = getCleanName(t2);
 
   return `
     <div class="match-card ${stageClass}${past ? ' past' : ''}" data-idx="${idx}" data-group="${group}" data-stage="${stage}">
@@ -608,9 +640,9 @@ function renderMatchCard(m, idx) {
         <span>${date} ${live ? '<span class="live-dot"></span>' : ''}${time}（北京时间）</span>
       </div>
       <div class="match-teams">
-        <div class="team"><span class="name">${team1Name}</span></div>
+        <div class="team">${prefix}${flag1}<span class="name">${name1}</span></div>
         <div class="match-vs">${live ? '🔴 进行中' : 'VS'}</div>
-        <div class="team"><span class="name">${team2Name}</span></div>
+        <div class="team">${prefix}${flag2}<span class="name">${name2}</span></div>
       </div>
       <div class="match-story">💬 ${story}</div>
       <div class="match-info">
