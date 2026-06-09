@@ -40,6 +40,14 @@ body {
 .header h1 .gold { color: #ffe082; }
 .header .subtitle { font-size: 13px; opacity: .9; margin-top: 4px; text-shadow: 0 1px 4px rgba(0,0,0,.3); }
 .header .dates { font-size: 12px; opacity: .75; margin-top: 2px; }
+.header-stats {
+  display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;
+  margin-top: 10px; font-size: 13px; font-weight: 600;
+}
+.header-stats span {
+  background: rgba(255,255,255,.13); backdrop-filter: blur(4px);
+  padding: 4px 14px; border-radius: 16px; white-space: nowrap;
+}
 
 /* Countdown */
 .countdown-bar {
@@ -254,6 +262,8 @@ body {
   .header { padding: 20px 8px 18px; min-height: 200px; }
   .header h1 { font-size: 18px; }
   .header .subtitle { font-size: 11px; }
+  .header-stats { gap: 8px; font-size: 11px; }
+  .header-stats span { padding: 3px 10px; }
   .countdown-item { min-width: 52px; padding: 8px 10px; }
   .countdown-item .num { font-size: 22px; }
   .match-teams { gap: 4px; }
@@ -275,6 +285,12 @@ body {
   <div class="header-content">
     <h1>🏆 <span class="gold">2026</span> 美加墨世界杯</h1>
     <p class="subtitle">FIFA World Cup 2026™ · 美国 · 加拿大 · 墨西哥</p>
+    <div class="header-stats">
+      <span>🏴 48支球队</span>
+      <span>⚽ 104场比赛</span>
+      <span>🏟 12个小组</span>
+      <span>📅 39天角逐</span>
+    </div>
     <p class="dates">📅 6月11日 – 7月19日（北京时间 6月12日 – 7月20日）</p>
     <div class="countdown-bar" id="countdown">
       <div class="countdown-item"><div class="num" id="cd-days">--</div><div class="label">天</div></div>
