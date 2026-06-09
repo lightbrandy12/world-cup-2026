@@ -193,10 +193,48 @@ body {
 .venue-card {
   background: var(--card); border-radius: 10px; padding: 12px 14px; box-shadow: var(--shadow);
   display: flex; align-items: center; gap: 10px; font-size: 13px;
+  cursor: pointer; transition: transform .15s, box-shadow .15s;
 }
+.venue-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,.12); }
 .venue-card .vc-icon { font-size: 24px; }
-.venue-card .vc-name { font-weight: 600; }
+.venue-card .vc-name { font-weight: 600; color: var(--pitch); }
+.venue-card .vc-hint { font-size: 10px; color: #aaa; margin-top: 2px; }
 .venue-card .vc-city { color: var(--text-muted); font-size: 11px; }
+
+/* ===== Venue Modal ===== */
+.venue-modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.75); z-index: 1000;
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+  animation: fadeIn .3s;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.venue-modal {
+  background: white; border-radius: 14px; max-width: 640px; width: 100%;
+  overflow: hidden; animation: slideUp .3s;
+}
+@keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.venue-modal-header {
+  padding: 14px 18px; display: flex; justify-content: space-between; align-items: center;
+  border-bottom: 1px solid #eee;
+}
+.venue-modal-header h3 { font-size: 17px; margin: 0; }
+.venue-modal-close {
+  background: none; border: none; font-size: 24px; cursor: pointer;
+  color: #999; line-height: 1; padding: 0 4px;
+}
+.venue-modal-close:hover { color: #333; }
+.venue-modal-img {
+  width: 100%; height: 320px; object-fit: cover; display: block;
+  background: #e8e8e8;
+}
+.venue-modal-loader {
+  height: 320px; display: flex; align-items: center; justify-content: center;
+  color: #999; font-size: 14px;
+}
+.venue-modal-info {
+  padding: 12px 18px 16px; font-size: 13px; color: var(--text-muted);
+  line-height: 1.6;
+}
 
 /* ===== Stats ===== */
 .stats-bar {
@@ -224,6 +262,9 @@ body {
   .tabs { margin: 12px 8px 0; }
   .match-list { padding: 0 8px 80px; }
   .match-story { font-size: 11px; padding: 6px 8px; }
+  .venue-modal { max-width: 95vw; }
+  .venue-modal-img { height: 200px; }
+  .venue-modal-loader { height: 200px; font-size: 12px; }
 }
 </style>
 </head>
@@ -415,23 +456,24 @@ const MATCHES = [
   ['7月19日','03:00','SF胜者','SF胜者','-','🏆 决赛','纽约/新泽西','大都会人寿体育场','final'],
 ];
 
+// [flag, city, stadium_name, capacity, wikipedia_page]
 const VENUES = [
-  ['🇲🇽','墨西哥城','阿兹特克体育场','87,523'],
-  ['🇺🇸','纽约/新泽西','大都会人寿体育场','82,500'],
-  ['🇺🇸','达拉斯','AT&T体育场','80,000'],
-  ['🇺🇸','堪萨斯城','箭头体育场','76,416'],
-  ['🇺🇸','休斯顿','NRG体育场','72,220'],
-  ['🇺🇸','亚特兰大','梅赛德斯-奔驰体育场','71,000'],
-  ['🇺🇸','洛杉矶','SoFi体育场','70,240'],
-  ['🇺🇸','费城','林肯金融体育场','69,176'],
-  ['🇺🇸','西雅图','流明球场','69,000'],
-  ['🇺🇸','旧金山','李维斯体育场','68,500'],
-  ['🇺🇸','波士顿','吉列体育场','65,878'],
-  ['🇺🇸','迈阿密','硬石体育场','64,767'],
-  ['🇨🇦','温哥华','BC Place','54,500'],
-  ['🇨🇦','多伦多','BMO球场','45,500'],
-  ['🇲🇽','蒙特雷','BBVA体育场','53,500'],
-  ['🇲🇽','瓜达拉哈拉','阿克伦体育场','48,071'],
+  ['🇲🇽','墨西哥城','阿兹特克体育场','87,523','Estadio_Azteca'],
+  ['🇺🇸','纽约/新泽西','大都会人寿体育场','82,500','MetLife_Stadium'],
+  ['🇺🇸','达拉斯','AT&T体育场','80,000','AT%26T_Stadium'],
+  ['🇺🇸','堪萨斯城','箭头体育场','76,416','Arrowhead_Stadium'],
+  ['🇺🇸','休斯顿','NRG体育场','72,220','NRG_Stadium'],
+  ['🇺🇸','亚特兰大','梅赛德斯-奔驰体育场','71,000','Mercedes-Benz_Stadium'],
+  ['🇺🇸','洛杉矶','SoFi体育场','70,240','SoFi_Stadium'],
+  ['🇺🇸','费城','林肯金融体育场','69,176','Lincoln_Financial_Field'],
+  ['🇺🇸','西雅图','流明球场','69,000','Lumen_Field'],
+  ['🇺🇸','旧金山','李维斯体育场','68,500','Levi%27s_Stadium'],
+  ['🇺🇸','波士顿','吉列体育场','65,878','Gillette_Stadium'],
+  ['🇺🇸','迈阿密','硬石体育场','64,767','Hard_Rock_Stadium'],
+  ['🇨🇦','温哥华','BC Place','54,500','BC_Place'],
+  ['🇨🇦','多伦多','BMO球场','45,500','BMO_Field'],
+  ['🇲🇽','蒙特雷','BBVA体育场','53,500','Estadio_BBVA'],
+  ['🇲🇽','瓜达拉哈拉','阿克伦体育场','48,071','Estadio_Akron'],
 ];
 
 const STAGE_NAMES = { group:'小组赛', r32:'1/16决赛', r16:'1/8决赛', qf:'1/4决赛', sf:'半决赛', '3rd':'季军战', final:'🏆 决赛' };
@@ -711,16 +753,69 @@ function renderBracket() {
   container.innerHTML = html;
 }
 
+function showVenueModal(venue) {
+  const [flag, city, name, capacity, wikiPage] = venue;
+  // 先创建弹窗
+  const overlay = document.createElement('div');
+  overlay.className = 'venue-modal-overlay';
+  overlay.innerHTML = `
+    <div class="venue-modal">
+      <div class="venue-modal-header">
+        <h3>${flag} ${name}</h3>
+        <button class="venue-modal-close">&times;</button>
+      </div>
+      <div class="venue-modal-loader">📡 正在加载场馆鸟瞰图…</div>
+      <div class="venue-modal-info">📍 ${city} &nbsp;|&nbsp; 🪑 容量 ${capacity} &nbsp;|&nbsp; 🏟 2026 世界杯主办场馆</div>
+    </div>`;
+  document.body.appendChild(overlay);
+
+  // 关闭事件
+  const close = () => overlay.remove();
+  overlay.querySelector('.venue-modal-close').onclick = close;
+  overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+  document.addEventListener('keydown', function esc(e) { if (e.key === 'Escape') { close(); document.removeEventListener('keydown', esc); } });
+
+  // 从 Wikipedia 获取图片
+  const loader = overlay.querySelector('.venue-modal-loader');
+  const img = document.createElement('img');
+  img.className = 'venue-modal-img';
+  img.alt = name;
+  img.onload = () => { loader.replaceWith(img); };
+  img.onerror = () => {
+    // Wikipedia 失败，用 Unsplash 备用
+    const fallback = document.createElement('img');
+    fallback.className = 'venue-modal-img';
+    fallback.alt = name;
+    fallback.onload = () => { loader.replaceWith(fallback); };
+    fallback.onerror = () => { loader.innerHTML = '😔 暂时无法加载场馆图片，请稍后重试'; };
+    fallback.src = `https://source.unsplash.com/800x500/?stadium,${encodeURIComponent(name)},aerial`;
+    loader.replaceWith(fallback);
+  };
+
+  // 先尝试 Wikipedia API
+  fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${wikiPage}`)
+    .then(r => r.json())
+    .then(data => {
+      if (data.thumbnail && data.thumbnail.source) {
+        img.src = data.thumbnail.source;
+      } else {
+        img.onerror(); // 触发备用
+      }
+    })
+    .catch(() => img.onerror());
+}
+
 function renderVenues() {
   const container = document.getElementById('venue-view');
-  let html = '<div style="padding:0 16px;max-width:800px;margin:0 auto;"><h3 style="margin:16px 0 8px;">📍 16 座主办城市场馆</h3><div class="venue-grid">';
+  let html = '<div style="padding:0 16px;max-width:800px;margin:0 auto;"><h3 style="margin:16px 0 8px;">📍 16 座主办城市场馆 · 点击查看鸟瞰图</h3><div class="venue-grid">';
   for (const v of VENUES) {
     html += `
-      <div class="venue-card">
+      <div class="venue-card" onclick="showVenueModal(${JSON.stringify(v).replace(/"/g,'&quot;')})">
         <div class="vc-icon">${v[0]}</div>
         <div>
           <div class="vc-name">${v[2]}</div>
           <div class="vc-city">${v[1]} · 容量 ${v[3]}</div>
+          <div class="vc-hint">👆 点击查看鸟瞰图</div>
         </div>
       </div>`;
   }
